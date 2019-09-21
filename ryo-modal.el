@@ -315,20 +315,14 @@ This function is meant to unbind keys set with `ryo-modal-set-key'."
   nil " ryo" ryo-modal-mode-map
   (if ryo-modal-mode
       (progn
-        (add-hook 'post-command-hook #'ryo-modal-maybe-store-last-command)
-        (when ryo-modal-cursor-color
-          (add-hook 'post-command-hook #'ryo-modal--cursor-color-update))
-        (setq-local cursor-type ryo-modal-cursor-type)
         (let ((map (eval (intern-soft (concat "ryo-" (symbol-name major-mode) "-map")))))
           (when map
             (make-local-variable 'minor-mode-overriding-map-alist)
             (push `(ryo-modal-mode . ,map) minor-mode-overriding-map-alist))))
-    (remove-hook 'post-command-hook #'ryo-modal-maybe-store-last-command)
-    (remove-hook 'post-command-hook #'ryo-modal--cursor-color-update)
-    (setq minor-mode-overriding-map-alist
-          (assq-delete-all 'ryo-modal-mode minor-mode-overriding-map-alist))
-    (set-cursor-color ryo-modal-default-cursor-color)
-    (setq-local cursor-type (default-value 'cursor-type))))
+    (progn
+      (setq minor-mode-overriding-map-alist
+            (assq-delete-all 'ryo-modal-mode minor-mode-overriding-map-alist))
+    )))
 
 (defun ryo-modal--cursor-color-update ()
   "Set cursor color depending on if `ryo-modal-mode' is active or not."
